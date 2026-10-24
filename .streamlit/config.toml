@@ -1,0 +1,12 @@
+[client]
+toolbarMode = "minimal"
+
+[server]
+# Taille maximale des fichiers envoyés (logo, sauvegarde à restaurer), en Mo.
+maxUploadSize = 50
+
+[browser]
+gatherUsageStats = false
+
+[theme]
+primaryColor = "#1F3864"
