@@ -1,0 +1,5 @@
+-r requirements.txt
+pytest>=8,<10
+pdfplumber>=0.11
+pillow>=10
+ruff>=0.5

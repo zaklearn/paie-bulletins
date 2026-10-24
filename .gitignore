@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Secrets et configuration locale
+.env
+.streamlit/secrets.toml
+
+# Données de paie : jamais versionnées
+data/*
+!data/.gitkeep
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+
+# Documents générés et sources de référence (données potentiellement réelles)
+*.pdf
+*.xlsx
+*.xls
+exports/
