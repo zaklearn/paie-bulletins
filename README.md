@@ -107,6 +107,7 @@ Restauration vérifiée et précédée d'une sauvegarde automatique. Procédures
 - [`docs/UTILISATION.md`](docs/UTILISATION.md) — guide de l'utilisateur
 - [`docs/DEPLOIEMENT.md`](docs/DEPLOIEMENT.md) — déploiement, sécurité, sauvegarde, restauration, conservation
 - [`docs/TESTS.md`](docs/TESTS.md) — résultats des tests
+- [`log.md`](log.md) — journal des versions et des correctifs
 
 ## Limites connues
 

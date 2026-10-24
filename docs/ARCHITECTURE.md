@@ -4,7 +4,9 @@
 
 ```
 app.py                         point d'entrée Streamlit : authentification + navigation
-pages/                         une page par écran (interface uniquement, aucune règle métier)
+views/                         une page par écran (interface uniquement, aucune règle métier).
+                               Ne pas nommer ce dossier « pages » : Streamlit en ferait un menu
+                               automatique accessible sans authentification.
   dashboard.py  entreprise.py  salaries.py  saisie.py  calcul.py
   archives.py   exports.py     parametres.py  administration.py
 src/
@@ -38,7 +40,7 @@ docs/                          audit des sources, architecture, utilisation, dé
 data/                          base et sauvegardes locales (non versionnées)
 ```
 
-Dépendances autorisées : `pages → ui → services → (calculations, repositories, pdf, validation) → models`.
+Dépendances autorisées : `views → ui → services → (calculations, repositories, pdf, validation) → models`.
 Le moteur (`calculations`) ne dépend que de `models` : il est testable isolément et réutilisable
 hors Streamlit.
 

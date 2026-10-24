@@ -8,9 +8,9 @@ import pytest
 from streamlit.testing.v1 import AppTest
 
 APP = str(Path(__file__).resolve().parent.parent / "app.py")
-PAGES = ["pages/dashboard.py", "pages/entreprise.py", "pages/salaries.py", "pages/saisie.py",
-         "pages/calcul.py", "pages/archives.py", "pages/exports.py", "pages/parametres.py",
-         "pages/administration.py"]
+PAGES = ["views/dashboard.py", "views/entreprise.py", "views/salaries.py", "views/saisie.py",
+         "views/calcul.py", "views/archives.py", "views/exports.py", "views/parametres.py",
+         "views/administration.py"]
 
 
 @pytest.fixture
@@ -44,7 +44,7 @@ def test_dashboard_shows_demo_company(app):
 
 def test_closed_september_is_read_only_in_entry_page(app):
     app.run()
-    app.switch_page("pages/saisie.py")
+    app.switch_page("views/saisie.py")
     app.run()
     assert any("clôturée" in w.value for w in app.warning)
 
@@ -52,7 +52,7 @@ def test_closed_september_is_read_only_in_entry_page(app):
 def test_entry_page_saves_october_draft(app):
     app.session_state["mois"] = 10
     app.run()
-    app.switch_page("pages/saisie.py")
+    app.switch_page("views/saisie.py")
     app.run()
     assert not app.exception
     save = [b for b in app.button if b.label == "Enregistrer le brouillon"][0]
@@ -81,3 +81,34 @@ def test_login_required_when_password_configured(tmp_path, monkeypatch):
     at.run()
     assert at.session_state["authenticated"] is True
     common._bootstrap.clear()
+
+
+@pytest.mark.parametrize("page", PAGES)
+def test_pages_unreachable_before_login(tmp_path, monkeypatch, page):
+    """Sans connexion, aucune page ne doit s'exécuter (pas de menu automatique « pages/ »)."""
+    from src.services.auth import hash_password
+    from src.ui import common
+    monkeypatch.setenv("PAIE_DB_PATH", str(tmp_path / "locked.db"))
+    monkeypatch.setenv("PAIE_AUTH_PASSWORD_HASH", hash_password("motdepasse-solide", iterations=1000))
+    common._bootstrap.clear()
+    at = AppTest.from_file(APP, default_timeout=60)
+    at.run()
+    try:
+        at.switch_page(page)
+        at.run()
+    except Exception:
+        pass
+    assert [t.value for t in at.title] == ["Connexion"]
+    common._bootstrap.clear()
+
+
+def test_no_streamlit_pages_directory():
+    assert not (Path(APP).parent / "pages").exists()
+
+
+def test_version_shown_and_logged(app):
+    from src import __version__
+    app.run()
+    assert any(c.value == f"Version {__version__}" for c in app.sidebar.caption)
+    log = (Path(APP).parent / "log.md").read_text(encoding="utf-8")
+    assert f"## [{__version__}]" in log
