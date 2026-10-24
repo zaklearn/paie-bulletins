@@ -2,6 +2,10 @@
 toolbarMode = "minimal"
 
 [server]
+# Pas de surveillance des fichiers : évite l'erreur « inotify instance limit reached »
+# sur Streamlit Community Cloud. En développement local, pour le rechargement
+# automatique, lancer : streamlit run app.py --server.fileWatcherType auto
+fileWatcherType = "none"
 # Taille maximale des fichiers envoyés (logo, sauvegarde à restaurer), en Mo.
 maxUploadSize = 50
 
