@@ -1,5 +1,0 @@
-# Dépendances d'exécution (Python 3.10+)
-streamlit>=1.45,<2
-reportlab>=4.0,<6
-pandas>=2.0,<4
-openpyxl>=3.1,<4
