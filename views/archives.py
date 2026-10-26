@@ -6,7 +6,7 @@ import streamlit as st
 from src.formatting import fmt_money
 from src.models.payroll import MOIS_FR, STATUT_CLOTUREE, STATUT_REMPLACEE, STATUTS_LIBELLES
 from src.services import master_data, payroll
-from src.ui.common import get_db, page_header
+from src.ui.common import get_db, mobile_download_link, page_header
 from src.ui.payslip_view import show_result
 
 db = get_db()
@@ -46,6 +46,7 @@ document = payroll.get_document(db, chosen.id)
 if document:
     st.download_button(f"Télécharger {document.filename}", document.content, file_name=document.filename,
                        mime="application/pdf", type="primary")
+    mobile_download_link(document.content, document.filename)
     st.caption(f"Archivé le {document.created_at.replace('T', ' ')} — SHA-256 `{document.sha256}`")
 if chosen.status == STATUT_REMPLACEE:
     st.warning("Version remplacée par une rectification : conservée pour l'historique, elle ne fait plus foi.")

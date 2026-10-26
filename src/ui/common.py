@@ -6,6 +6,8 @@ données de paie sont lues et écrites en base via les services.
 
 from __future__ import annotations
 
+import base64
+import html
 from decimal import Decimal
 
 import pandas as pd
@@ -159,3 +161,25 @@ def page_header(title: str, caption: str | None = None) -> None:
     st.title(title)
     if caption:
         st.caption(caption)
+
+
+# --- Téléchargement direct (mobile) -------------------------------------------------------
+
+def direct_download_html(content: bytes, filename: str, label: str,
+                         mime: str = "application/pdf") -> str:
+    """Lien qui télécharge le fichier sur place (données intégrées, sans nouvel onglet).
+
+    Sur Streamlit Community Cloud, `st.download_button` ouvre le fichier dans un nouvel onglet,
+    ouverture que Chrome et Firefox mobiles bloquent sans message (diagnostic du 2026-10-26).
+    """
+    data = base64.b64encode(content).decode("ascii")
+    return (f'<a href="data:{html.escape(mime, quote=True)};base64,{data}" '
+            f'download="{html.escape(filename, quote=True)}" target="_self" '
+            'style="font-family:sans-serif;font-size:14px;color:#1F3864;">'
+            f"{html.escape(label)}</a>")
+
+
+def mobile_download_link(content: bytes, filename: str) -> None:
+    """Affiche le lien dans un cadre (`st.iframe`). Le HTML est entièrement produit ici :
+    contenu encodé en base64, nom de fichier et libellé échappés."""
+    st.iframe(direct_download_html(content, filename, f"📱 Télécharger sur mobile : {filename}"), height=32)

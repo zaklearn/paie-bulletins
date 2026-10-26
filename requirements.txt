@@ -1,5 +1,5 @@
 # Dépendances d'exécution (Python 3.10+)
-streamlit>=1.45,<2
+streamlit>=1.65,<2          # st.iframe (lien de téléchargement mobile)
 reportlab>=4.0,<6
 pandas>=2.0,<4
 openpyxl>=3.1,<4

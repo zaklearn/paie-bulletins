@@ -15,6 +15,51 @@ Historique des changements du générateur de bulletins de paie.
 
 ---
 
+## [1.2.1] — 2026-10-26
+
+**Type :** correctif (téléchargement sur mobile).
+
+### Corrigé
+- **Bouton « Télécharger bulletin… » sans effet sur Android** (Samsung A52, Chrome et Firefox),
+  alors qu'il fonctionne sur ordinateur.
+  - *Diagnostic :* en local, le téléchargement fonctionne en Android émulé. Sur Streamlit Cloud,
+    l'hébergeur fait ouvrir le fichier par `st.download_button` dans un nouvel onglet
+    (option `enforceDownloadInNewTab` du code Streamlit), ouverture que les navigateurs mobiles
+    bloquent sans message.
+  - *Confirmation :* sur le téléphone, l'adresse sans le cadre de Streamlit Cloud
+    (`…/~/+/`) ouvre le PDF.
+  - *Correctif :* sous le bouton existant, un lien « 📱 Télécharger sur mobile » qui télécharge
+    sur place le **même PDF archivé** (données intégrées, `target="_self"`), affiché par `st.iframe`
+    dans un cadre où Streamlit autorise les téléchargements. Pages Archives et Calcul (paie
+    clôturée). Le bouton d'origine est conservé.
+  - *Écartés :* lien dans `st.markdown` (Streamlit impose un nouvel onglet), `st.html` (adresse du
+    fichier supprimée par sécurité), `components.html` (obsolète selon Streamlit).
+
+### Modifié
+- `requirements.txt` : `streamlit>=1.65` (nécessaire pour `st.iframe` ; versions testées 1.65.0 et
+  1.66.1, Streamlit Cloud installe 1.66.1).
+
+### Tests
+- `tests/test_mobile_download.py` (5) : octets identiques au document archivé, nom de fichier,
+  `target="_self"`, nom et libellé échappés (pas d'injection), aucun lien pour une paie non
+  clôturée. Sans le correctif des pages, les 2 tests de pages échouent.
+- Serveur réel, Chromium (Pixel 7 émulé et ordinateur), pages Archives et Calcul : fichier reçu,
+  empreinte SHA-256 identique à celle du bulletin archivé.
+- Non vérifié : vrai téléphone sur Streamlit Cloud (inaccessible depuis l'environnement de test).
+
+### Fichiers
+`src/ui/common.py`, `views/archives.py`, `views/calcul.py`, `requirements.txt`, `src/__init__.py`,
+`tests/test_mobile_download.py`, `log.md`, `docs/TESTS.md`, `docs/UTILISATION.md`
+
+### Calculs
+Aucun changement.
+
+### Limites
+Les autres boutons de téléchargement (aperçu provisoire, CSV/Excel, sauvegardes) n'ont pas de
+lien mobile ; sur téléphone, utiliser l'adresse `…/~/+/` ou un ordinateur.
+
+---
+
 ## [1.2.0] — 2026-10-26
 
 **Type :** évolution mineure — **correctifs de sécurité et d'intégrité**, changement de
@@ -222,7 +267,8 @@ réellement en service »).
 |---|---|---|---|
 | 1.0.x | `b3e6001`, `db693d1`, `bb2479a`, `b111bed`, `1cf98a4` | non vérifiée (états intermédiaires) | non vérifié |
 | 1.1.0 | `afc8a81` (2026-10-24 15:13) | identique fichier par fichier à `659b9c9`, comparaison du 2026-10-26 ; 173 tests réussis sur ce clone | non vérifié |
-| 1.2.0 | à compléter après votre push | | |
+| 1.2.0 | non poussée séparément | | |
+| 1.2.1 | à compléter après votre push | | |
 
 ## Modèle pour une prochaine version
 

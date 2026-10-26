@@ -10,7 +10,8 @@ from src.models.payroll import (
 from src.pdf.bulletin import bulletin_filename
 from src.services import master_data, payroll
 from src.ui.common import (
-    actor, employee_selector, get_db, page_header, period_selector, run_action, show_issues,
+    actor, employee_selector, get_db, mobile_download_link, page_header, period_selector, run_action,
+    show_issues,
 )
 from src.ui.payslip_view import show_result
 from src.validation.validators import AVERTISSEMENT, has_errors
@@ -91,6 +92,7 @@ elif slip.status == STATUT_CLOTUREE:
     if document:
         st.download_button(f"Télécharger {document.filename}", document.content, file_name=document.filename,
                            mime="application/pdf", type="primary")
+        mobile_download_link(document.content, document.filename)
         st.caption(f"Empreinte SHA-256 : `{document.sha256}`")
     show_result(slip.result, slip.cumuls)
     st.subheader("Rectification")

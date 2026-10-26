@@ -69,6 +69,11 @@ le journal des opérations.
 
 ## 6. Points d'attention
 
+- Téléphone : si « Télécharger bulletin… » ne réagit pas (cas constaté sur Android avec Streamlit
+  Cloud), utilisez le lien **📱 Télécharger sur mobile** placé juste en dessous. Pour les autres
+  téléchargements (CSV, Excel, sauvegardes), ouvrez l'application à l'adresse se terminant par
+  `/~/+/` ou utilisez un ordinateur.
+
 - Connexion : si un mot de passe est configuré, utilisez **Se déconnecter** (menu de gauche)
   avant de quitter un poste ou un téléphone partagé. Sans mot de passe ni dérogation locale,
   l'application affiche « Configuration incomplète » : voir `docs/DEPLOIEMENT.md`.

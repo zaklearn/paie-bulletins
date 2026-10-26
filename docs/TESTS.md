@@ -1,5 +1,20 @@
 # Résultats des tests
 
+## Version 1.2.1 — 2026-10-26
+
+| Exécution | Résultat |
+|---|---|
+| Python 3.13.17 / streamlit 1.66.1, avec le classeur source | **211 réussis**, 0 échec |
+| Python 3.10.20 / streamlit 1.65.0, avec le classeur source | **211 réussis**, 0 échec |
+| Python 3.10.20, sans classeur | 210 réussis, 1 ignoré |
+| Ruff (E, F, W, B) | aucune remarque |
+
+Nouveau : `test_mobile_download.py` (5 tests ; les 2 tests de pages échouent sans le correctif).
+Serveur réel + Chromium (Pixel 7 émulé et ordinateur) : le lien « Télécharger sur mobile » des pages
+Archives et Calcul fournit un fichier d'empreinte SHA-256 identique au bulletin archivé.
+Non vérifié : vrai téléphone sur Streamlit Cloud.
+
+
 ## Version 1.2.0 — 2026-10-26
 
 Environnements neufs installés avec `pip install -r requirements-dev.txt`.
