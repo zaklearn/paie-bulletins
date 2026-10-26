@@ -118,3 +118,50 @@ Pour plusieurs gestionnaires simultanés ou un accès distant élargi : PostgreS
 contraintes d'unicité et déclencheurs), authentification individuelle (SSO/OIDC) avec rôles
 « saisie » / « validation », séparation des tâches (le valideur n'est pas le saisisseur),
 sauvegardes gérées par la base, journalisation centralisée.
+
+## 8. Passage en production : remise à zéro
+
+Retire la démonstration (et toutes les données présentes) pour démarrer avec une société réelle.
+
+### Sur votre ordinateur (Windows)
+
+1. Fermez l'application : fenêtre de l'invite où tourne `streamlit run`, puis Ctrl+C.
+2. Activez l'environnement : `C:\python3.10\py310_env\Scripts\activate.bat`.
+3. Double-cliquez sur `reinitialiser_production.bat`, ou depuis l'invite :
+   ```bat
+   cd /d "D:\bulletinPaie_ezzine\paie_v1.2"
+   reinitialiser_production.bat
+   ```
+4. Lisez l'inventaire affiché. Si la ligne « ATTENTION : la base contient des données qui ne sont
+   PAS la démonstration » apparaît, vérifiez qu'il s'agit bien de la bonne base.
+5. Tapez `EFFACER` pour confirmer (toute autre réponse annule).
+
+Ce que fait le script, dans l'ordre (chaque étape arrête tout en cas d'échec) :
+
+| Étape | Résultat |
+|---|---|
+| Contrôle que la base n'est pas en cours d'utilisation | sinon : « fermez l'application », rien n'est modifié |
+| Sauvegarde puis vérification de la sauvegarde | `data\backups\paie_…_avant_reinitialisation.db` |
+| Déplacement de l'ancienne base (rien n'est supprimé) | `data\backups\ancienne_base_AAAAMMJJ_HHMMSS\` |
+| Base neuve : schéma + version initiale des paramètres | aucune entreprise, aucun salarié, aucune paie |
+| `PAIE_SEED_DEMO=0` dans `.env` (autres lignes conservées) | la démonstration n'est plus rechargée au démarrage |
+
+Ensuite : définir un mot de passe (si `.env` contient `PAIE_ALLOW_NO_AUTH=1`, le script le
+signale), lancer l'application, renseigner **Entreprise**, créer les **Salariés**, faire valider
+les **Paramètres** par un professionnel.
+
+Pour annuler une remise à zéro : restaurer `paie_…_avant_reinitialisation.db` depuis la page
+**Sauvegardes et administration**, puis remettre `PAIE_SEED_DEMO=1` si besoin.
+
+Options : `--confirm EFFACER` (sans question), `--db`, `--backup-dir`, `--env-file`
+(par défaut : les chemins de la configuration).
+
+### Sur Streamlit Community Cloud
+
+Le script ne s'y exécute pas. Dans *Settings → Secrets*, mettre `PAIE_SEED_DEMO = "0"`, puis
+*Reboot app*. **Non vérifié** : la documentation de la plateforme décrit un disque éphémère, mais
+aucun essai n'a confirmé qu'un redémarrage efface la base. Si la démonstration est toujours
+présente après redémarrage, supprimez l'application sur Streamlit Cloud puis redéployez-la avec
+`PAIE_SEED_DEMO = "0"` dans les secrets. Rappel : ce disque éphémère ne convient pas à des
+données de paie réelles (section 3).
+

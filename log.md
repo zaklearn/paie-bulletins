@@ -15,6 +15,45 @@ Historique des changements du générateur de bulletins de paie.
 
 ---
 
+## [1.3.0] — 2026-10-26
+
+**Type :** évolution mineure (outil de passage en production).
+
+### Ajouté
+- `reinitialiser_production.bat` (lanceur Windows, fins de ligne CRLF, ASCII) et
+  `scripts/reset_production.py` : remise à zéro avant une mise en production avec une société
+  réelle. Inventaire (signale une base qui n'est pas la démonstration), confirmation `EFFACER`,
+  contrôle que la base n'est pas en cours d'utilisation, sauvegarde **vérifiée** avant toute
+  modification, **déplacement** de l'ancienne base (aucune suppression ; remise en place si le
+  déplacement échoue), base neuve avec la version initiale des paramètres, `PAIE_SEED_DEMO=0`
+  dans `.env` (autres lignes conservées), avertissement si `PAIE_ALLOW_NO_AUTH=1`.
+- `.gitattributes` : `*.bat` en CRLF pour que Git conserve le format Windows.
+- Documentation : `README.md`, `docs/DEPLOIEMENT.md` section 8 (ordinateur et Streamlit Cloud).
+
+### Tests
+- `tests/test_reset_production.py` (15) : inventaire démonstration / données réelles, base neuve
+  vide et utilisable (première paie sans cumul hérité), sauvegarde valide et complète, ancienne
+  base intacte, `.env` mis à jour sans perte, `.env` absent, avertissement mot de passe, base en
+  cours d'utilisation → arrêt sans modification, échec de déplacement → remise en place,
+  confirmation exacte exigée (`non`, `effacer`, vide refusés), mode interactif, lanceur `.bat`.
+- Essai de bout en bout : script réel sur une base de démonstration (refus puis confirmation),
+  puis démarrage de l'application → base vide, démonstration non rechargée.
+
+### Constat (non modifié)
+- La vérification d'une sauvegarde (lecture seule) laisse des fichiers `-wal` (vide) et `-shm`
+  à côté du fichier `.db`. Vérifié : le `.db` seul contient toutes les données. Comportement
+  antérieur à cette version.
+
+### Fichiers
+`reinitialiser_production.bat`, `scripts/reset_production.py`, `.gitattributes`,
+`tests/test_reset_production.py`, `src/__init__.py`, `log.md`, `README.md`,
+`docs/DEPLOIEMENT.md`, `docs/TESTS.md`
+
+### Calculs
+Aucun changement. Calculs, modèles, schéma, services et pages non modifiés.
+
+---
+
 ## [1.2.1] — 2026-10-26
 
 **Type :** correctif (téléchargement sur mobile).
@@ -268,7 +307,8 @@ réellement en service »).
 | 1.0.x | `b3e6001`, `db693d1`, `bb2479a`, `b111bed`, `1cf98a4` | non vérifiée (états intermédiaires) | non vérifié |
 | 1.1.0 | `afc8a81` (2026-10-24 15:13) | identique fichier par fichier à `659b9c9`, comparaison du 2026-10-26 ; 173 tests réussis sur ce clone | non vérifié |
 | 1.2.0 | non poussée séparément | | |
-| 1.2.1 | à compléter après votre push | | |
+| 1.2.1 | non poussée séparément | | |
+| 1.3.0 | à compléter après votre push | | |
 
 ## Modèle pour une prochaine version
 

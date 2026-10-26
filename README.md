@@ -101,6 +101,13 @@ Interface **Sauvegardes et administration**, ou `python scripts/backup_db.py` (p
 Restauration vérifiée et précédée d'une sauvegarde automatique. Procédures :
 [`docs/DEPLOIEMENT.md`](docs/DEPLOIEMENT.md).
 
+## Passage en production (société réelle)
+
+Pour retirer la démonstration et repartir d'une base vide, fermez l'application puis lancez
+`reinitialiser_production.bat` (Windows) ou `python scripts/reset_production.py`. Une sauvegarde
+vérifiée est créée d'abord, l'ancienne base est conservée, et `PAIE_SEED_DEMO=0` est écrit dans
+`.env`. Procédure complète : [`docs/DEPLOIEMENT.md`](docs/DEPLOIEMENT.md), section 8.
+
 ## Documentation
 
 - [`docs/AUDIT_SOURCES.md`](docs/AUDIT_SOURCES.md) — audit du classeur et du PDF, écarts, hypothèses, décisions

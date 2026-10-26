@@ -1,5 +1,20 @@
 # Résultats des tests
 
+## Version 1.3.0 — 2026-10-26
+
+| Exécution | Résultat |
+|---|---|
+| Python 3.13.17, avec le classeur source | **226 réussis**, 0 échec |
+| Python 3.10.20, avec le classeur source | **226 réussis**, 0 échec |
+| Python 3.10.20, sans classeur | 225 réussis, 1 ignoré |
+| Ruff (E, F, W, B) | aucune remarque |
+
+Nouveau : `test_reset_production.py` (15). Essai de bout en bout du script réel (refus, puis
+confirmation) et démarrage de l'application sur la base remise à zéro : base vide, démonstration
+non rechargée. Non exécuté : le lanceur `.bat` lui-même (environnement de test Linux) ; son format
+(CRLF, ASCII) et la commande appelée sont vérifiés par un test.
+
+
 ## Version 1.2.1 — 2026-10-26
 
 | Exécution | Résultat |
