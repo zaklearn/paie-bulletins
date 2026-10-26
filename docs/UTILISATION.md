@@ -69,6 +69,10 @@ le journal des opérations.
 
 ## 6. Points d'attention
 
+- Connexion : si un mot de passe est configuré, utilisez **Se déconnecter** (menu de gauche)
+  avant de quitter un poste ou un téléphone partagé. Sans mot de passe ni dérogation locale,
+  l'application affiche « Configuration incomplète » : voir `docs/DEPLOIEMENT.md`.
+
 - Les champs numériques de Streamlit affichent le point décimal (`5436.51`) ; tous les tableaux,
   récapitulatifs et le PDF utilisent le format français (`5 436,51`).
 - Entrée ou sortie en cours de mois : saisissez directement le salaire de base proratisé et les

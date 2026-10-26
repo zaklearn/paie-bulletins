@@ -12,7 +12,7 @@ from datetime import datetime
 from pathlib import Path
 
 from src.repositories import repos
-from src.repositories.db import SCHEMA_VERSION, Database
+from src.repositories.db import MIGRATIONS, SCHEMA_VERSION, Database, _split_sql
 from src.services.errors import PayrollError
 
 
@@ -38,8 +38,35 @@ def list_backups(backup_dir: Path) -> list[Path]:
     return sorted(backup_dir.glob("paie_*.db"), reverse=True)
 
 
+_PROTECTIONS_SQL = ("SELECT type, name, sql FROM sqlite_master "
+                    "WHERE type IN ('trigger', 'index') AND sql IS NOT NULL")
+
+
+def _protections(conn: sqlite3.Connection) -> dict[tuple[str, str], str]:
+    """Déclencheurs et index explicites d'une base, SQL normalisé (espaces)."""
+    return {(kind, name): " ".join(sql.split()) for kind, name, sql in conn.execute(_PROTECTIONS_SQL)}
+
+
+def _expected_protections(version: int) -> dict[tuple[str, str], str]:
+    """Déclencheurs et index produits par les migrations jusqu'à `version` (base en mémoire)."""
+    conn = sqlite3.connect(":memory:")
+    try:
+        for migration_version, script in MIGRATIONS:
+            if migration_version <= version:
+                for statement in _split_sql(script):
+                    conn.execute(statement)
+        return _protections(conn)
+    finally:
+        conn.close()
+
+
 def validate_backup_file(path: Path) -> None:
-    """Vérifie qu'un fichier est une base de paie intègre et compatible."""
+    """Vérifie qu'un fichier est une base de paie intègre et compatible.
+
+    Les déclencheurs (immuabilité des paies clôturées, des bulletins, du journal) et les index
+    d'unicité doivent être exactement ceux du schéma : une sauvegarde où ils manquent, diffèrent
+    ou sont complétés serait restaurée sans ces protections, et `migrate()` ne les recréerait pas.
+    """
     try:
         conn = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
         try:
@@ -48,12 +75,17 @@ def validate_backup_file(path: Path) -> None:
             version = conn.execute("SELECT MAX(version) FROM schema_version").fetchone()[0]
             for table in ("company", "employees", "parameter_sets", "payslips", "documents", "audit_log"):
                 conn.execute(f"SELECT COUNT(*) FROM {table}")
+            if version is None or version > SCHEMA_VERSION:
+                raise PayrollError("Version de schéma incompatible avec cette application.")
+            if _protections(conn) != _expected_protections(version):
+                raise PayrollError("Sauvegarde refusée : les protections de la base (déclencheurs ou "
+                                   "index d'unicité) ne correspondent pas au schéma attendu.")
+            if conn.execute("PRAGMA foreign_key_check").fetchone() is not None:
+                raise PayrollError("Sauvegarde refusée : références incohérentes entre les tables.")
         finally:
             conn.close()
     except sqlite3.DatabaseError as exc:
         raise PayrollError("Ce fichier n'est pas une sauvegarde de paie valide.") from exc
-    if version is None or version > SCHEMA_VERSION:
-        raise PayrollError("Version de schéma incompatible avec cette application.")
 
 
 def restore_backup(db: Database, content: bytes, backup_dir: Path, actor: str) -> Path:

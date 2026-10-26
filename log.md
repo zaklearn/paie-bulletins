@@ -15,6 +15,59 @@ Historique des changements du générateur de bulletins de paie.
 
 ---
 
+## [1.2.0] — 2026-10-26
+
+**Type :** évolution mineure — **correctifs de sécurité et d'intégrité**, changement de
+comportement de la configuration. Audit contrôlé (Étapes A à E), correctifs C1 à C4.
+
+### Corrigé
+- **C1 — Ouverture silencieuse sans mot de passe.** Si `PAIE_AUTH_PASSWORD_HASH` était vide,
+  l'application s'ouvrait à tous (`src/config.py`, `require_login`). Elle reste désormais **fermée**
+  (« Configuration incomplète », aucune page exécutée), sauf dérogation explicite
+  `PAIE_ALLOW_NO_AUTH=1` réservée à l'usage local.
+- **C2 — Restauration d'une sauvegarde altérée.** Une sauvegarde dont les déclencheurs
+  d'immuabilité avaient été supprimés était acceptée ; après restauration, une paie clôturée
+  pouvait être modifiée et son PDF archivé supprimé, et `migrate()` ne recréait pas les
+  protections. `validate_backup_file` compare maintenant déclencheurs et index au schéma issu des
+  migrations (absents, modifiés ou ajoutés → refus) et contrôle les références entre tables
+  (`PRAGMA foreign_key_check`). Le refus intervient avant toute action sur la base.
+
+### Ajouté
+- **C3 — Bouton « Se déconnecter »** dans le menu lorsqu'un mot de passe est configuré.
+- **C4 — Traçabilité** : procédure « Vérifier la version réellement en service »
+  (`docs/DEPLOIEMENT.md`) ; tableau de correspondance limité aux éléments vérifiés.
+- Variable `PAIE_ALLOW_NO_AUTH` (défaut `0`), documentée dans `.env.example`, `README.md` et
+  `docs/DEPLOIEMENT.md`.
+
+### Tests
+- `tests/test_access_control.py` (25) : configuration sûre par défaut, application et 9 pages
+  bloquées sans secret, mode local explicite, connexion valide/invalide, nom obligatoire,
+  nouvelle session, déconnexion, navigation.
+- `tests/test_backup_integrity.py` (8) : 5 altérations de schéma refusées sans toucher à la base
+  actuelle, références incohérentes refusées, restauration valide conservant protections et PDF,
+  base de l'application conforme.
+- `tests/test_app_smoke.py` : le mode sans mot de passe y est déclaré explicitement
+  (`PAIE_ALLOW_NO_AUTH=1`) ; le test des pages vérifie désormais le titre de chaque page (il
+  passait auparavant même lorsque l'application était bloquée).
+- Preuve : sur le code 1.1.0, 26 des 33 nouveaux tests échouent ; les 7 autres sont des contrôles
+  de non-régression.
+
+### Fichiers
+`src/config.py`, `src/ui/common.py`, `src/services/backup.py`, `src/__init__.py`, `.env.example`,
+`README.md`, `docs/DEPLOIEMENT.md`, `docs/TESTS.md`, `docs/UTILISATION.md`, `log.md`,
+`tests/test_access_control.py`,
+`tests/test_backup_integrity.py`, `tests/test_app_smoke.py`
+
+### Calculs
+Aucun changement. Modules de calcul, modèles, schéma SQL et références `golden` non modifiés.
+
+### Action requise au déploiement
+Vérifier que `PAIE_AUTH_PASSWORD_HASH` est défini dans les secrets Streamlit Cloud **avant** de
+pousser : sinon l'application affichera « Configuration incomplète ». En local, copier
+`.env.example` en `.env` (il contient `PAIE_ALLOW_NO_AUTH=1`) ou définir un mot de passe.
+
+---
+
 ## [1.1.0] — 2026-10-24
 
 **Type :** évolution mineure (suivi des versions).
@@ -161,12 +214,15 @@ Méthode du classeur appliquée par défaut ; méthode du PDF disponible comme p
 
 À compléter à chaque `git push` depuis votre ordinateur (`git log --oneline -1` donne l'identifiant).
 
-| Version | Commit `paie-bulletins` | Date de mise en ligne | Déployée sur Streamlit Cloud |
+Ne renseigner que ce qui est vérifié. La colonne « déployée » se remplit après lecture de la
+version affichée dans l'application (procédure : `docs/DEPLOIEMENT.md`, « Vérifier la version
+réellement en service »).
+
+| Version | Commit `paie-bulletins` | Vérification du contenu | Déployée sur Streamlit Cloud |
 |---|---|---|---|
-| 1.0.0 → 1.0.2 | (commit « v1.2 » et fusion de la licence) | 2026-10-24 | oui |
-| 1.0.3 | | | |
-| 1.0.4 | | | |
-| 1.1.0 | | | |
+| 1.0.x | `b3e6001`, `db693d1`, `bb2479a`, `b111bed`, `1cf98a4` | non vérifiée (états intermédiaires) | non vérifié |
+| 1.1.0 | `afc8a81` (2026-10-24 15:13) | identique fichier par fichier à `659b9c9`, comparaison du 2026-10-26 ; 173 tests réussis sur ce clone | non vérifié |
+| 1.2.0 | à compléter après votre push | | |
 
 ## Modèle pour une prochaine version
 

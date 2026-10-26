@@ -39,7 +39,7 @@ cd paie
 python3 -m venv .venv
 source .venv/bin/activate          # Windows : .venv\Scripts\activate
 pip install -r requirements.txt
-cp .env.example .env               # facultatif : chemins, mot de passe, démonstration
+cp .env.example .env               # Windows : copy .env.example .env (mode local sans mot de passe)
 streamlit run app.py
 ```
 
@@ -64,7 +64,8 @@ Résultats détaillés : [`docs/TESTS.md`](docs/TESTS.md) — 162 tests réussis
 |---|---|---|
 | `PAIE_DB_PATH` | `data/paie.db` | Fichier de base SQLite |
 | `PAIE_BACKUP_DIR` | `data/backups` | Répertoire des sauvegardes |
-| `PAIE_AUTH_PASSWORD_HASH` | vide | Hachage du mot de passe d'accès (`python scripts/hash_password.py`) ; vide = accès libre, usage local uniquement |
+| `PAIE_AUTH_PASSWORD_HASH` | vide | Hachage du mot de passe d'accès (`python scripts/hash_password.py`). **Obligatoire** : sans lui, l'application reste fermée (« Configuration incomplète »), sauf dérogation ci-dessous |
+| `PAIE_ALLOW_NO_AUTH` | `0` | `1` = accès sans mot de passe lorsque le hachage est vide. **Usage local uniquement**, jamais sur un hébergement |
 | `PAIE_SEED_DEMO` | `1` | Charge la démonstration fictive dans une base vide ; mettre `0` en production |
 
 ## Base de données

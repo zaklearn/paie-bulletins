@@ -30,15 +30,25 @@ class Settings:
     backup_dir: Path
     auth_password_hash: str
     seed_demo: bool
+    allow_no_auth: bool = False
 
     @property
     def auth_enabled(self) -> bool:
         return bool(self.auth_password_hash)
 
+    @property
+    def access_blocked(self) -> bool:
+        """Aucun mot de passe et aucune dérogation explicite : l'application ne s'ouvre pas."""
+        return not self.auth_enabled and not self.allow_no_auth
+
 
 def _resolve(value: str) -> Path:
     path = Path(value)
     return path if path.is_absolute() else PROJECT_ROOT / path
+
+
+def _flag(name: str, default: str) -> bool:
+    return os.environ.get(name, default).strip().lower() in ("1", "true", "oui", "yes")
 
 
 def load_settings() -> Settings:
@@ -47,5 +57,6 @@ def load_settings() -> Settings:
         db_path=_resolve(os.environ.get("PAIE_DB_PATH", "data/paie.db")),
         backup_dir=_resolve(os.environ.get("PAIE_BACKUP_DIR", "data/backups")),
         auth_password_hash=os.environ.get("PAIE_AUTH_PASSWORD_HASH", "").strip(),
-        seed_demo=os.environ.get("PAIE_SEED_DEMO", "1").strip().lower() in ("1", "true", "oui", "yes"),
+        seed_demo=_flag("PAIE_SEED_DEMO", "1"),
+        allow_no_auth=_flag("PAIE_ALLOW_NO_AUTH", "0"),
     )

@@ -11,6 +11,9 @@ APP = str(Path(__file__).resolve().parent.parent / "app.py")
 PAGES = ["views/dashboard.py", "views/entreprise.py", "views/salaries.py", "views/saisie.py",
          "views/calcul.py", "views/archives.py", "views/exports.py", "views/parametres.py",
          "views/administration.py"]
+PAGE_TITLES = ["Tableau de bord", "Entreprise", "Salariés", "Saisie mensuelle", "Calcul et validation",
+               "Bulletins et archives", "Récapitulatifs et exports", "Paramètres de paie",
+               "Sauvegardes et administration"]
 
 
 @pytest.fixture
@@ -19,6 +22,7 @@ def app(tmp_path, monkeypatch):
     monkeypatch.setenv("PAIE_BACKUP_DIR", str(tmp_path / "backups"))
     monkeypatch.setenv("PAIE_SEED_DEMO", "1")
     monkeypatch.setenv("PAIE_AUTH_PASSWORD_HASH", "")
+    monkeypatch.setenv("PAIE_ALLOW_NO_AUTH", "1")      # mode local sans mot de passe, choisi explicitement
     from src.ui import common
     common._bootstrap.clear()
     at = AppTest.from_file(APP, default_timeout=60)
@@ -28,12 +32,13 @@ def app(tmp_path, monkeypatch):
     common._bootstrap.clear()
 
 
-@pytest.mark.parametrize("page", PAGES)
-def test_page_runs_without_exception(app, page):
+@pytest.mark.parametrize("page, title", zip(PAGES, PAGE_TITLES, strict=True))
+def test_page_runs_without_exception(app, page, title):
     app.run()
     app.switch_page(page)
     app.run()
     assert not app.exception, [e.value for e in app.exception]
+    assert [t.value for t in app.title] == [title]          # la page s'est réellement exécutée
 
 
 def test_dashboard_shows_demo_company(app):

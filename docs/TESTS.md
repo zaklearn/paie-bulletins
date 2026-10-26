@@ -1,5 +1,33 @@
 # Résultats des tests
 
+## Version 1.2.0 — 2026-10-26
+
+Environnements neufs installés avec `pip install -r requirements-dev.txt`.
+
+| Exécution | Résultat |
+|---|---|
+| Python 3.13.17, avec `PAIE_REFERENCE_XLSX` (classeur source local) | **206 réussis**, 0 échec, 0 ignoré |
+| Python 3.10.20, avec `PAIE_REFERENCE_XLSX` | **206 réussis**, 0 échec, 0 ignoré |
+| Python 3.10.20, sans classeur | 205 réussis, 1 ignoré (comparaison cellule par cellule) |
+| Ruff (E, F, W, B) | aucune remarque |
+| État initial (1.1.0) | 173 réussis |
+
+Nouveaux tests : `test_access_control.py` (25) et `test_backup_integrity.py` (8). Exécutés sur le
+code 1.1.0, 26 de ces 33 tests échouent (les 7 autres sont des contrôles de non-régression) : ils
+détectent les défauts corrigés.
+
+Vérifications sur un serveur Streamlit réel (Chromium) :
+- sans `PAIE_AUTH_PASSWORD_HASH` ni dérogation : `/`, `/administration`, `/parametres`, `/saisie`
+  affichent « Configuration incomplète », sans menu ;
+- avec mot de passe : `/administration` → « Connexion » ; après connexion, « Version 1.2.0 » ;
+  après « Se déconnecter » → « Connexion », puis `/administration` → « Connexion ».
+- Constat résiduel : après déconnexion, le menu reste affiché jusqu'au rechargement de la page ;
+  un clic sur un lien ramène à « Connexion » sans afficher de donnée.
+
+Non vérifié : comportement sur Streamlit Community Cloud (aucun accès depuis cet environnement).
+
+## Version 1.1.0 et antérieures
+
 Également exécutée sous Python 3.10.20 (pandas 2.3.3, streamlit 1.65.0) : 161 réussis, 1 ignoré.
 
 Exécution du 23/10/2026, environnement virtuel neuf installé avec `pip install -r requirements-dev.txt`

@@ -45,12 +45,28 @@ def actor() -> str:
 
 
 def require_login() -> bool:
-    """Affiche l'écran de connexion si un mot de passe est configuré. Renvoie True si l'accès est ouvert."""
+    """Contrôle d'accès. Renvoie True si l'accès est ouvert.
+
+    - mot de passe configuré : écran de connexion, puis bouton de déconnexion ;
+    - aucun mot de passe et `PAIE_ALLOW_NO_AUTH=1` : accès libre (usage local choisi explicitement) ;
+    - aucun mot de passe et aucune dérogation : l'application reste bloquée.
+    """
     cfg = settings()
+    if cfg.access_blocked:
+        st.title("Configuration incomplète")
+        st.error("Aucun mot de passe d'accès n'est configuré : l'application reste fermée. "
+                 "Définissez PAIE_AUTH_PASSWORD_HASH (secrets de l'hébergement ou fichier .env). "
+                 "Pour un usage local sans mot de passe, définissez explicitement PAIE_ALLOW_NO_AUTH=1. "
+                 "Voir docs/DEPLOIEMENT.md.", icon="⛔")
+        return False
     if not cfg.auth_enabled:
-        st.sidebar.warning("Accès sans mot de passe (mode local). Voir docs/DEPLOIEMENT.md.", icon="⚠️")
+        st.sidebar.warning("Accès sans mot de passe (PAIE_ALLOW_NO_AUTH=1, usage local). "
+                           "Voir docs/DEPLOIEMENT.md.", icon="⚠️")
         return True
     if st.session_state.get("authenticated"):
+        if st.sidebar.button("Se déconnecter", key="logout"):
+            st.session_state.clear()
+            st.rerun()
         return True
     st.title("Connexion")
     with st.form("login"):
