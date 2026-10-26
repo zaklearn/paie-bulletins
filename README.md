@@ -108,6 +108,10 @@ Pour retirer la démonstration et repartir d'une base vide, fermez l'application
 vérifiée est créée d'abord, l'ancienne base est conservée, et `PAIE_SEED_DEMO=0` est écrit dans
 `.env`. Procédure complète : [`docs/DEPLOIEMENT.md`](docs/DEPLOIEMENT.md), section 8.
 
+Si la société et des salariés réels ont déjà été saisis à côté de la démonstration, utilisez plutôt
+`supprimer_demo.bat` (`python scripts/supprimer_demo.py`) : seul le salarié de démonstration et
+ses paies sont supprimés (section 9).
+
 ## Documentation
 
 - [`docs/AUDIT_SOURCES.md`](docs/AUDIT_SOURCES.md) — audit du classeur et du PDF, écarts, hypothèses, décisions

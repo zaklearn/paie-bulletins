@@ -1,5 +1,20 @@
 # Résultats des tests
 
+## Version 1.4.0 — 2026-10-26
+
+| Exécution | Résultat |
+|---|---|
+| Python 3.13.17, avec le classeur source | **239 réussis**, 0 échec |
+| Python 3.10.20, avec le classeur source | **239 réussis**, 0 échec |
+| Python 3.10.20, sans classeur | 238 réussis, 1 ignoré |
+| Ruff (E, F, W, B) | aucune remarque |
+
+Nouveau : `test_supprimer_demo.py` (13). Essai de bout en bout du script réel sur une base mêlant
+démonstration et données réelles (fictives) : seul le salarié de démonstration est supprimé, le
+livre de paie ne contient plus qu'une paie par mois ; second lancement : « rien à faire ».
+Non exécuté : le lanceur `.bat` lui-même (format et commande vérifiés par un test).
+
+
 ## Version 1.3.0 — 2026-10-26
 
 | Exécution | Résultat |

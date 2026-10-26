@@ -15,6 +15,42 @@ Historique des changements du générateur de bulletins de paie.
 
 ---
 
+## [1.4.0] — 2026-10-26
+
+**Type :** évolution mineure (suppression ciblée de la démonstration).
+
+### Contexte
+Récapitulatif 2026 fourni par l'utilisateur : les 3 paies clôturées du salarié de démonstration
+s'ajoutaient à celles du salarié réel (2 paies par mois, totaux doublés). Masquer automatiquement
+les salariés désactivés a été écarté : les paies d'un salarié réel parti en cours d'année doivent
+rester dans le livre de paie et les récapitulatifs annuels.
+
+### Ajouté
+- `supprimer_demo.bat` (CRLF, ASCII) et `scripts/supprimer_demo.py` : supprime uniquement le
+  salarié de démonstration (matricule, nom **et** CIN de la démonstration), ses paies et ses
+  bulletins ; conserve l'entreprise, les autres salariés et leurs paies, les paramètres et le
+  journal. Refus si la fiche `0001` a été modifiée. Sauvegarde vérifiée, puis transaction unique :
+  protections de suppression levées puis rétablies à l'identique et contrôlées (sinon annulation
+  complète). `PAIE_SEED_DEMO=0` dans `.env`. Avertit si la fiche Entreprise est encore celle de la
+  démonstration.
+- Documentation : `README.md`, `docs/DEPLOIEMENT.md` section 9.
+
+### Tests
+- `tests/test_supprimer_demo.py` (13) : inventaire, suppression limitée à la démonstration avec
+  données réelles identiques (société, fiche, paies, cumuls, bulletins), protections rétablies et
+  actives, récapitulatif ne contenant plus que les données réelles, refus si la fiche a été
+  modifiée, rien à faire sans démonstration, annulation complète en cas d'échec dans la
+  transaction, base en cours d'utilisation, confirmation exacte, avertissement société, lanceur.
+
+### Fichiers
+`scripts/supprimer_demo.py`, `supprimer_demo.bat`, `tests/test_supprimer_demo.py`,
+`src/__init__.py`, `log.md`, `README.md`, `docs/DEPLOIEMENT.md`, `docs/TESTS.md`
+
+### Calculs
+Aucun changement. Calculs, modèles, schéma, services, pages et exports non modifiés.
+
+---
+
 ## [1.3.0] — 2026-10-26
 
 **Type :** évolution mineure (outil de passage en production).
@@ -308,7 +344,8 @@ réellement en service »).
 | 1.1.0 | `afc8a81` (2026-10-24 15:13) | identique fichier par fichier à `659b9c9`, comparaison du 2026-10-26 ; 173 tests réussis sur ce clone | non vérifié |
 | 1.2.0 | non poussée séparément | | |
 | 1.2.1 | non poussée séparément | | |
-| 1.3.0 | à compléter après votre push | | |
+| 1.3.0 | `6f7bdbd` (2026-10-26 17:46) | identique à `b82953f`, comparaison du 2026-10-26 | non vérifié |
+| 1.4.0 | à compléter après votre push | | |
 
 ## Modèle pour une prochaine version
 

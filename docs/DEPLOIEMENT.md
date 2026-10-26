@@ -165,3 +165,32 @@ présente après redémarrage, supprimez l'application sur Streamlit Cloud puis 
 `PAIE_SEED_DEMO = "0"` dans les secrets. Rappel : ce disque éphémère ne convient pas à des
 données de paie réelles (section 3).
 
+## 9. Supprimer uniquement la démonstration (données réelles déjà saisies)
+
+À utiliser lorsque la société réelle et des salariés réels ont été saisis dans une base qui
+contient encore la démonstration : les paies du salarié exemple faussent alors le livre de paie
+et les récapitulatifs (totaux doublés). La désactivation ne suffit pas : les paies d'un salarié
+désactivé restent, à juste titre, dans les récapitulatifs de l'année (départ en cours d'année).
+
+1. Fermez l'application, activez l'environnement Python.
+2. Lancez `supprimer_demo.bat` depuis le dossier de l'application.
+3. Vérifiez la liste affichée : « À SUPPRIMER » (salarié `0001 EXEMPLE`, ses paies et bulletins)
+   et « CONSERVÉ » (entreprise, autres salariés et leurs paies, paramètres, journal).
+4. Tapez `EFFACER`.
+
+Garde-fous :
+
+| Situation | Comportement |
+|---|---|
+| Matricule `0001` dont le nom ou le CIN a été modifié | refus : il peut s'agir d'un salarié réel |
+| Aucun salarié de démonstration | « rien à faire », aucune modification |
+| Application ouverte (base en cours d'utilisation) | arrêt sans modification |
+| Toute erreur pendant la suppression | annulation complète (transaction unique) |
+
+Déroulement : sauvegarde vérifiée (`data\backups\paie_…_avant_suppression_demo.db`), puis en une
+seule transaction : levée des deux protections de suppression, suppression des bulletins, des
+paies et de la fiche du salarié de démonstration, rétablissement des protections à l'identique,
+contrôle des protections et des références, inscription au journal. Enfin `PAIE_SEED_DEMO=0`
+dans `.env`. Pour revenir en arrière : restaurer la sauvegarde depuis la page **Sauvegardes et
+administration**.
+
